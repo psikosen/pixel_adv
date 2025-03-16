@@ -129,18 +129,7 @@ const AnimationPreview = ({
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Animation Preview</h2>
-        <div className="flex items-center">
-          <span className="text-sm mr-2">Speed</span>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={speed}
-            className="slider"
-            readOnly
-          />
-        </div>
+        <h2 className="text-lg font-semibold">Animation Preview</h2> 
       </div>
       
       <div className="mb-2 text-xs">
@@ -167,19 +156,7 @@ const AnimationPreview = ({
         )}
       </div>
       
-      <div className="mt-4 flex justify-between items-center">
-        <button 
-          className="btn btn-secondary"
-          onClick={() => {
-            // This would be handled by parent component
-          }}
-        >
-          {isPlaying ? 'Pause' : 'Play'}
-        </button>
-        <div className="text-sm">
-          Frame {currentFrameIndex + 1} of {frames.length} ({fps.toFixed(0)} FPS)
-        </div>
-      </div>
+  
     </div>
   );
 };

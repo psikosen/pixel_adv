@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 interface ControlPanelProps {
+  onSpecialModeToggle?: () => void;
   style: string;
   onStyleChange: (style: string) => void;
   object: string;
@@ -23,6 +24,7 @@ interface ControlPanelProps {
   onAnimationTypeChange?: (type: string) => void;
   easing?: string;
   onEasingChange?: (easing: string) => void;
+  specialModeActive?: boolean;
 }
 
 const ControlPanel = ({
@@ -46,7 +48,9 @@ const ControlPanel = ({
   animationType = 'loop',
   onAnimationTypeChange = () => {},
   easing = 'linear',
-  onEasingChange = () => {}
+  onEasingChange = () => {},
+  onSpecialModeToggle = () => {},
+  specialModeActive = false
 }: ControlPanelProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   
@@ -81,8 +85,41 @@ const ControlPanel = ({
       
       {/* Advanced Settings */}
       {showAdvanced && (
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="col-span-2">
+        <div>
+          <div className="flex justify-center mb-4">
+            <button 
+              className={`btn ${specialModeActive ? 'btn-primary shadow-glow' : 'btn-secondary'} w-full`}
+              onClick={onSpecialModeToggle}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2" />
+                  <path d="M12 20v2" />
+                  <path d="M20 12h2" />
+                  <path d="M2 12h2" />
+                  <path d="M19.07 4.93l-1.41 1.41" />
+                  <path d="M4.93 19.07l1.41-1.41" />
+                  <path d="M19.07 19.07l-1.41-1.41" />
+                  <path d="M4.93 4.93l1.41 1.41" />
+                </svg>
+                <span>Special Mode {specialModeActive ? 'Active' : ''}</span>
+              </div>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="col-span-2">
             <div className="control-label">API Key</div>
             <input
               type="password"
@@ -94,9 +131,9 @@ const ControlPanel = ({
             <div className="text-xs text-gray-500 mt-1">
               Required for image generation via Gemini AI
             </div>
-          </div>
-          
-          <div>
+            </div>
+            
+            <div>
             <div className="control-label">Animation Type</div>
             <select 
               className="control-select"
@@ -108,9 +145,9 @@ const ControlPanel = ({
               <option value="once">Play Once</option>
               <option value="reverse">Reverse Loop</option>
             </select>
-          </div>
-          
-          <div>
+            </div>
+            
+            <div>
             <div className="control-label">Easing</div>
             <select 
               className="control-select"
@@ -122,6 +159,7 @@ const ControlPanel = ({
               <option value="ease-out">Ease Out</option>
               <option value="ease-in-out">Ease In-Out</option>
             </select>
+            </div>
           </div>
         </div>
       )}

@@ -8,15 +8,16 @@ const GEMINI_API_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/mo
  * Generate pixel art image using Gemini API
  * @param prompt The text prompt for image generation
  * @param apiKey The Gemini API key
+ * @param model The Gemini model to use
  * @returns Promise resolving to the generated image data URL
  */
-export const generatePixelArtImage = async (prompt: string, apiKey: string): Promise<string> => {
+export const generatePixelArtImage = async (prompt: string, apiKey: string, model: string = 'gemini-2.0-flash-exp'): Promise<string> => {
   try {
     if (!apiKey) {
       throw new Error("Gemini API key is required");
     }
     
-    const url = `${GEMINI_API_ENDPOINT}?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -75,7 +76,8 @@ export const generatePixelArtImage = async (prompt: string, apiKey: string): Pro
 export const generatePixelArtBatch = async (
   prompt: string,
   count: number = 8,
-  apiKey: string
+  apiKey: string,
+  model: string = 'gemini-2.0-flash-exp'
 ): Promise<string[]> => {
   try {
     if (!apiKey) {
@@ -83,7 +85,7 @@ export const generatePixelArtBatch = async (
     }
     
     // Use numOfImages parameter in the request
-    const url = `${GEMINI_API_ENDPOINT}?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -148,7 +150,8 @@ export const generatePixelArtBatch = async (
 export const generatePixelArtFrames = async (
   basePrompt: string,
   count: number = 8,
-  apiKey: string
+  apiKey: string,
+  model: string = 'gemini-2.0-flash-exp'
 ): Promise<string[]> => {
   try {
     // Try to generate all frames at once using batch API
@@ -156,7 +159,7 @@ export const generatePixelArtFrames = async (
       // Add animation-specific context to the prompt
       const batchPrompt = `${basePrompt} - Create a sequence of ${count} frames for a pixel art animation. Each frame should be part of a coherent animation sequence. Make each frame 32x32 pixels with clear outlines and limited color palette.`;
       
-      return await generatePixelArtBatch(batchPrompt, count, apiKey);
+      return await generatePixelArtBatch(batchPrompt, count, apiKey, model);
     } catch (batchError) {
       console.warn("Batch generation failed, falling back to sequential generation:", batchError);
       
@@ -169,7 +172,7 @@ export const generatePixelArtFrames = async (
         const framePrompt = `${basePrompt} - frame ${i+1} of ${count} in an animation sequence. Make it a pixel art style image.`;
         
         // Generate the image
-        const imageUrl = await generatePixelArtImage(framePrompt, apiKey);
+        const imageUrl = await generatePixelArtImage(framePrompt, apiKey, model);
         frames.push(imageUrl);
       }
       

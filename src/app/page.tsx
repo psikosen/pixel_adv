@@ -7,6 +7,7 @@ import FrameManager from '../components/sprites/FrameManager';
 import ControlPanel from '../components/ui/ControlPanel';
 import AnimationControls from '../components/animation/AnimationControls';
 import Feedback from '../components/ui/Feedback';
+import SpecialModeDialog from '../components/ui/SpecialModeDialog';
 import { initDatabase, isDatabaseInitialized } from '../lib/db/indexedDb';
 import { 
   SpriteSet, 
@@ -58,6 +59,12 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   const [error, setError] = useState<string | null>(null);
+  
+  // State for Special Mode
+  // Special Mode is a powerful feature that allows users to split sprite sheets into individual frames
+  // It's activated via a glowing button in the advanced settings panel
+  const [specialModeActive, setSpecialModeActive] = useState(false);
+  const [specialModeDialogOpen, setSpecialModeDialogOpen] = useState(false);
 
   // Initialize database on component mount
   useEffect(() => {
@@ -275,6 +282,52 @@ export default function Home() {
     setSpeed(newSpeed);
   };
 
+  // Handler function for Special Mode
+  const handleSpecialModeToggle = () => {
+    if (specialModeActive) {
+      // Turn off special mode
+      setSpecialModeActive(false);
+    } else {
+      // Turn on special mode and open dialog
+      setSpecialModeActive(true);
+      setSpecialModeDialogOpen(true);
+    }
+  };
+
+  /**
+   * Handler function for importing frames from Special Mode
+   * @param importedFrames Frames imported from the Special Mode dialog
+   * 
+   * Note: Frames are stored in the IndexedDB database, not as separate image files on disk.
+   * This is why you won't see them as separate files in a directory.
+   */
+  const handleImportFrames = (importedFrames: Frame[]) => {
+    if (importedFrames.length === 0) return;
+    
+    // Create a new sprite set with the imported frames
+    const newSet: SpriteSet = {
+      id: Math.random().toString(36).substring(2, 8),
+      frames: importedFrames.map(frame => frame.src),
+      thumbnails: importedFrames.map(frame => frame.src),
+      metadata: {
+        style: 'imported',
+        object: 'custom',
+        action: 'animation',
+        background: 'custom',
+        prompt: 'Imported from Special Mode',
+        createdAt: new Date().toISOString()
+      }
+    };
+    
+    const updatedSpriteSets = [...spriteSets, newSet];
+    setSpriteSets(updatedSpriteSets);
+    setActiveSpriteSetId(newSet.id);
+    setFrames(importedFrames);
+    
+    // Save to storage
+    saveSpriteSetsToStorage(updatedSpriteSets);
+  };
+
   // Handler function for generating frames
   const handleGenerate = async () => {
     // Clear any previous errors
@@ -382,6 +435,8 @@ export default function Home() {
           onAnimationTypeChange={setAnimationType}
           easing={easing}
           onEasingChange={setEasing}
+          onSpecialModeToggle={handleSpecialModeToggle}
+          specialModeActive={specialModeActive}
         />
         
         <div className="panel flex-1 flex flex-col">
@@ -437,6 +492,14 @@ export default function Home() {
         loadingMessage={loadingMessage}
         error={error}
         onDismissError={() => setError(null)}
+      />
+      
+      {/* Special Mode Dialog */}
+      <SpecialModeDialog
+        isOpen={specialModeDialogOpen}
+        onClose={() => setSpecialModeDialogOpen(false)}
+        onImportFrames={handleImportFrames}
+        apiKey={apiKey}
       />
     </MainLayout>
   );

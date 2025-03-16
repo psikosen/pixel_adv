@@ -88,11 +88,4 @@ pnpm dev
   - `animation`: Animation utilities (animationUtils, frameManager, exportUtils)
 - `public`: Static assets
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Inspired by pixel art animation tools and sprite editors
-- Uses the glassmorphic UI design pattern for a modern look
+ 

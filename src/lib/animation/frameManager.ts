@@ -191,7 +191,12 @@ export const reorderFramesInSpriteSet = (
 };
 
 /**
- * Save sprite sets to local storage or database
+ * Save sprite sets to IndexedDB database
+ * 
+ * IMPORTANT: Frames are stored in the browser's IndexedDB database, not as image files on disk.
+ * The actual image data is stored as base64-encoded strings in the database.
+ * This is why you won't see separate image files in a directory.
+ * 
  * @param spriteSets Array of SpriteSets to save
  */
 export const saveSpriteSetsToStorage = async (spriteSets: SpriteSet[]): Promise<void> => {
